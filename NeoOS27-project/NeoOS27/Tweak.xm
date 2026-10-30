@@ -154,14 +154,27 @@ static NeoGestureCatcher *gGestureCatcher;
 }
 %end
 
+static void NeoPreferencesChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
+    NeoLoadPrefs();
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!gEnabled || !gIslandEnabled) {
+            gNeoWindow.hidden = YES;
+        } else {
+            NeoShowUI();
+        }
+    });
+}
+
 %ctor {
     @autoreleasepool {
         NeoLoadPrefs();
-        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL,
-            (CFNotificationCallback)^(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
-                NeoLoadPrefs();
-                if (!gEnabled && gNeoWindow) gNeoWindow.hidden = YES;
-                else NeoShowUI();
-            }, CFSTR("com.neoos27.tweak/preferences.changed"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            NULL,
+            NeoPreferencesChanged,
+            CFSTR("com.neoos27.tweak/preferences.changed"),
+            NULL,
+            CFNotificationSuspensionBehaviorDeliverImmediately
+        );
     }
 }
