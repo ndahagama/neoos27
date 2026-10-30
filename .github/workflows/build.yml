@@ -23,7 +23,10 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential clang make perl python3 git curl ldid dpkg-dev
+          sudo apt-get install -y build-essential clang make perl python3 git curl dpkg-dev
+          sudo curl -L --fail --retry 3 -o /usr/local/bin/ldid https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus7/ldid_linux_x86_64
+          sudo chmod 755 /usr/local/bin/ldid
+          ldid -h >/dev/null 2>&1 || true
       - name: Install Theos and iOS SDKs
         run: |
           git clone --recursive https://github.com/theos/theos.git "$HOME/theos"
