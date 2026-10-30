@@ -32,6 +32,10 @@ jobs:
           git clone --recursive https://github.com/theos/theos.git "$HOME/theos"
           rm -rf "$HOME/theos/sdks"
           git clone https://github.com/theos/sdks.git "$HOME/theos/sdks"
+          sudo apt-get install -y libtinfo6
+          mkdir -p "$HOME/theos/toolchain"
+          curl -fsSL --retry 3 https://github.com/L1ghtmann/llvm-project/releases/latest/download/iOSToolchain-x86_64.tar.xz | tar -xJf - -C "$HOME/theos/toolchain"
+          test -x "$HOME/theos/toolchain/linux/iphone/bin/clang"
           echo "THEOS=$HOME/theos" >> "$GITHUB_ENV"
       - name: Build ${{ matrix.scheme }} package
         working-directory: NeoOS27-project/NeoOS27
