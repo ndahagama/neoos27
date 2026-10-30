@@ -1,0 +1,9 @@
+Package: com.neoos27.tweak
+Name: NeoOS 27
+Version: 0.1.0
+Architecture: iphoneos-arm
+Description: Dynamic Island-style overlay, glass UI and gesture navigation prototype for legacy iPhones.
+Maintainer: NeoOS 27 Community
+Author: NeoOS 27 Community
+Section: Tweaks
+Depends: mobilesubstrate
