@@ -1,0 +1,50 @@
+name: Build NeoOS 27 packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "NeoOS27-project/NeoOS27/**"
+      - ".github/workflows/build-deb.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out NeoOS 27
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo add-apt-repository universe -y
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang git make perl python3 curl libssl-dev libxml2-dev ldid
+
+      - name: Install Theos and iOS SDKs
+        run: |
+          git clone --recursive https://github.com/theos/theos.git "$HOME/theos"
+          git clone https://github.com/theos/sdks.git "$HOME/theos/sdks"
+          echo "THEOS=$HOME/theos" >> "$GITHUB_ENV"
+
+      - name: Build rootless package
+        working-directory: NeoOS27-project/NeoOS27
+        run: |
+          export THEOS="$HOME/theos"
+          make clean
+          make package ROOTLESS=1
+
+      - name: Build rootful package
+        working-directory: NeoOS27-project/NeoOS27
+        run: |
+          export THEOS="$HOME/theos"
+          make clean
+          make package ROOTLESS=0
+
+      - name: Upload Debian packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: NeoOS27-deb-packages
+          path: NeoOS27-project/NeoOS27/packages/*.deb
+          if-no-files-found: error
+          retention-days: 14
